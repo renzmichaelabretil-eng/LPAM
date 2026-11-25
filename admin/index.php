@@ -32,43 +32,6 @@ page_head('Admin Console');
 <?php if($m=flash('success')): ?><div class="notice success">
 <?= htmlspecialchars($m) ?></div>
 <?php endif;
-?><div class="table-card">
-<table class="score-table">
-<thead>
-<tr>
-<th>Sport</th>
-<th>Event</th>
-<th>Division</th>
-<th>Status</th>
-<th>Published</th>
-<th>
-</th>
-</tr>
-</thead>
-<tbody>
-<?php foreach($events as $e): ?><tr>
-<td>
-<span class="title-ic"><?= sport_icon($e['sport_name'],$e['icon'],18) ?></span><?= htmlspecialchars($e['sport_name']) ?></td>
-<td>
-<strong>
-<?= htmlspecialchars($e['name']) ?></strong>
-</td>
-<td>
-<?= htmlspecialchars($e['division']) ?></td>
-<td>
-<span class="status
-<?= $e['status'] ?>">
-<?= $e['status'] ?></span>
-</td>
-<td>
-<?= $e['gold_team']?'Yes':'No' ?></td>
-<td class="actions">
-<a class="btn secondary" href="<?= app_url('admin/event.php') ?>?id=<?= $e['id'] ?>">Enter winners</a>
-</td>
-</tr>
-<?php endforeach;
-?></tbody>
-</table>
-</div>
+?><section class="result-desk"><div class="directory-heading"><div><span class="form-kicker">Result publishing</span><h2>Events in your desk</h2></div><p>Choose an event to enter, correct, or replace its medal winner photos.</p></div><div class="result-desk-grid"><?php foreach($events as $e): ?><article class="result-desk-card <?= $e['gold_team'] ? 'is-published' : '' ?>"><header><span class="title-ic"><?= sport_icon($e['sport_name'],$e['icon'],22) ?></span><div><small><?= htmlspecialchars($e['sport_name']) ?></small><h3><?= htmlspecialchars($e['name']) ?></h3></div><span class="status <?= $e['status'] ?>"><?= htmlspecialchars($e['status']) ?></span></header><p><?= htmlspecialchars($e['division'] ?: 'Open division') ?><?= $e['venue'] ? ' · ' . htmlspecialchars($e['venue']) : '' ?></p><footer><span class="result-published <?= $e['gold_team'] ? 'yes' : '' ?>"><?= $e['gold_team'] ? '✓ Results published' : '○ Winners not entered' ?></span><a class="btn <?= $e['gold_team'] ? 'secondary' : '' ?>" href="<?= app_url('admin/event.php') ?>?id=<?= $e['id'] ?>"><?= $e['gold_team'] ? 'Edit result' : 'Enter winners' ?></a></footer></article><?php endforeach; ?><?php if(!$events): ?><p class="empty">No events are assigned to this desk.</p><?php endif; ?></div></section>
 <?php page_foot();
 ?>

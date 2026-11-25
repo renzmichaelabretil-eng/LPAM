@@ -24,6 +24,74 @@ document.querySelectorAll('[data-password-toggle]').forEach(button => button.add
 const administratorModal = document.getElementById('administrator-modal');
 const deleteAdministratorModal = document.getElementById('delete-administrator-modal');
 document.querySelectorAll('[data-modal-close]').forEach(button => button.addEventListener('click', () => button.closest('dialog')?.close()));
+
+// Public result photo details modal.
+const resultPhotoModal = document.getElementById('result-photo-modal');
+document.querySelectorAll('[data-result-photo]').forEach(button => button.addEventListener('click', () => {
+    if (!resultPhotoModal) return;
+    const set = (selector, value) => { const el = resultPhotoModal.querySelector(selector); if (el) el.textContent = value || '—'; };
+    const image = resultPhotoModal.querySelector('#result-modal-image');
+    image.src = button.dataset.image;
+    image.alt = button.dataset.player || 'Winner';
+    set('#result-modal-medal', `${button.dataset.medal} medal`);
+    set('#result-modal-title', button.dataset.player);
+    set('#result-modal-team', button.dataset.team);
+    set('#result-modal-event', button.dataset.event);
+    set('#result-modal-sport', button.dataset.sport);
+    set('#result-modal-venue', button.dataset.venue);
+    resultPhotoModal.showModal();
+}));
+resultPhotoModal?.addEventListener('click', event => {
+    if (event.target === resultPhotoModal) resultPhotoModal.close();
+});
+
+// Search, paging, and show/hide controls for public content lists.
+document.querySelectorAll('[data-content-controls]').forEach(controls => {
+    const list = document.querySelector(controls.dataset.target);
+    if (!list) return;
+    const items = Array.from(list.querySelectorAll(controls.dataset.item));
+    const search = controls.querySelector('input[type="search"]');
+    const toggle = controls.querySelector('[data-list-toggle]');
+    const count = controls.querySelector('[data-content-count]');
+    const pageSize = parseInt(controls.dataset.pageSize, 10) || 8;
+    const pagination = document.createElement('nav');
+    pagination.className = 'pagination';
+    pagination.setAttribute('aria-label', 'List pages');
+    controls.insertAdjacentElement('afterend', pagination);
+    let page = 1;
+    let open = true;
+
+    const render = () => {
+        const term = (search?.value || '').trim().toLowerCase();
+        const matched = items.filter(item => item.textContent.toLowerCase().includes(term));
+        const pages = Math.max(1, Math.ceil(matched.length / pageSize));
+        page = Math.min(page, pages);
+        list.hidden = !open;
+        pagination.hidden = !open || pages <= 1;
+        items.forEach(item => { item.hidden = !open || !matched.includes(item) || matched.indexOf(item) < (page - 1) * pageSize || matched.indexOf(item) >= page * pageSize; });
+        if (count) count.textContent = open ? `${matched.length} item${matched.length === 1 ? '' : 's'} shown` : 'List hidden';
+        if (toggle) {
+            toggle.textContent = open ? `Hide ${toggle.dataset.label || 'list'}` : `Show ${toggle.dataset.label || 'list'}`;
+            toggle.setAttribute('aria-expanded', String(open));
+        }
+        pagination.replaceChildren();
+        if (!pagination.hidden) {
+            const addButton = (label, target, disabled = false, active = false) => {
+                const button = document.createElement('button');
+                button.type = 'button'; button.textContent = label; button.disabled = disabled; button.classList.toggle('active', active);
+                button.addEventListener('click', () => { page = target; render(); list.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+                pagination.append(button);
+            };
+            addButton('Previous', page - 1, page === 1);
+            for (let number = 1; number <= pages; number++) addButton(String(number), number, false, number === page);
+            addButton('Next', page + 1, page === pages);
+        }
+    };
+    search?.addEventListener('input', () => { page = 1; render(); });
+    controls.querySelector('[data-search-button]')?.addEventListener('click', () => { page = 1; render(); });
+    toggle?.addEventListener('click', () => { open = !open; render(); });
+    render();
+});
 document.querySelectorAll('[data-admin-modal]').forEach(button => button.addEventListener('click', () => {
     if (!administratorModal) return;
     const edit = button.dataset.adminModal === 'edit';
@@ -124,6 +192,24 @@ document.querySelectorAll('[data-entry-modal]').forEach(button => button.addEven
     entryModal.querySelector('#entry-event-label').textContent = button.dataset.label;
     entryModal.showModal();
 }));
+
+// Games countdown: switches to a live message automatically once the meet starts.
+const navToggle = document.querySelector('.nav-toggle');
+const siteNavigation = document.getElementById('site-navigation');
+if (navToggle && siteNavigation) {
+    navToggle.addEventListener('click', () => {
+        const open = siteNavigation.classList.toggle('is-open');
+        navToggle.classList.toggle('is-open', open);
+        navToggle.setAttribute('aria-expanded', String(open));
+        navToggle.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+    });
+    siteNavigation.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+        siteNavigation.classList.remove('is-open');
+        navToggle.classList.remove('is-open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.setAttribute('aria-label', 'Open navigation menu');
+    }));
+}
 
 // Games countdown: switches to a live message automatically once the meet starts.
 document.querySelectorAll('[data-games-start]').forEach(widget => {

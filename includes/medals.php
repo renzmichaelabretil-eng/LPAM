@@ -22,6 +22,22 @@ function area_logo_bg(string $name): string
 }
 
 /**
+ * A stable CSS class for each delegation so the official tables can carry the
+ * delegation's own colour palette without storing presentation data in MySQL.
+ */
+function area_brand_class(string $name): string
+{
+    $key = preg_replace('/[^a-z0-9]/', '', preg_replace('/^\s*area\s*/i', '', strtolower($name)));
+    if (preg_match('/^(iv|v|i{1,3})([a-z]?)$/', $key, $m)) {
+        $key = ['i' => 1, 'ii' => 2, 'iii' => 3, 'iv' => 4, 'v' => 5][$m[1]] . $m[2];
+    }
+
+    return in_array($key, ['1', '2a', '2b', '3', '4', '5a', '5b'], true)
+        ? 'delegation-area-' . $key
+        : 'delegation-default';
+}
+
+/**
  * Calculates standings from the source results, so the public tally cannot drift
  * from corrected results. Only competition results marked final are counted.
  */

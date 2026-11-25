@@ -88,6 +88,25 @@ const SPORTICON_FILES = [
 function sport_icon(string $name, string $emoji = '', int $size = 24): string
 {
     $key = icon_key($name);
+    // Division labels (for example, "Basketball 5x5 (Sec.)") should still
+    // receive their sport's icon instead of the generic trophy fallback.
+    foreach ([
+        'athletics' => 'athletics', 'basketball' => 'basketball',
+        'volleyball' => 'volleyball', 'badminton' => 'badminton',
+        'taekwondo' => 'taekwondo', 'sepaktakraw' => 'sepaktakraw',
+        'archery' => 'archery', 'arnis' => 'arnis', 'baseball' => 'baseball',
+        'softball' => 'softball', 'billiards' => 'billiards', 'billards' => 'billiards',
+        'boxing' => 'boxing', 'chess' => 'chess', 'dancesports' => 'dancesports',
+        'football' => 'football', 'futsal' => 'futsal', 'gymnastics' => 'gymnastics',
+        'paragames' => 'paragames', 'pencaksilat' => 'pencaksilat',
+        'swimming' => 'swimming', 'tabletennis' => 'tabletennis', 'tennis' => 'tennis',
+        'weightlifting' => 'weightlifting', 'wrestling' => 'wrestling', 'wushu' => 'wushu',
+    ] as $prefix => $iconKey) {
+        if (str_starts_with($key, $prefix)) {
+            $key = $iconKey;
+            break;
+        }
+    }
     if (!isset(ICON_PATHS[$key])) {
         $key = icon_from_emoji($emoji);
     }
@@ -99,33 +118,17 @@ function sport_icon(string $name, string $emoji = '', int $size = 24): string
     return icon($key, $size);
 }
 
-/** Glossy medal. Needs medal_defs() printed once per page for the gradients. */
+/** Official event medal artwork. */
 function medal_icon(string $type, int $size = 22): string
 {
     $type = in_array($type, ['gold', 'silver', 'bronze'], true) ? $type : 'gold';
-    return '<svg class="medal-ic medal-ic-' . $type . '" width="' . $size . '" height="' . $size . '" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
-        . '<path d="M6 1.5h4.2l2.4 8-3.6 1.2z" fill="url(#rib-' . $type . ')"/>'
-        . '<path d="M18 1.5h-4.2l-2.4 8 3.6 1.2z" fill="url(#rib-' . $type . ')" opacity=".82"/>'
-        . '<circle cx="12" cy="15.2" r="7" fill="url(#disc-' . $type . ')" stroke="url(#edge-' . $type . ')" stroke-width="1"/>'
-        . '<circle cx="12" cy="15.2" r="4.6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width=".8"/>'
-        . '<path d="M12 11.8l1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" fill="#fff" fill-opacity=".85"/>'
-        . '<path d="M7.6 12.2a5.3 5.3 0 013.4-2.4" stroke="#fff" stroke-opacity=".7" stroke-width="1.1" fill="none" stroke-linecap="round"/>'
-        . '</svg>';
+    $src = app_url('assets/medal-' . $type . '.png');
+    return '<img class="medal-ic medal-ic-' . $type . '" src="' . htmlspecialchars($src, ENT_QUOTES, 'UTF-8')
+        . '" width="' . $size . '" height="' . $size . '" alt="" aria-hidden="true" loading="lazy">';
 }
 
-/** Gradient definitions used by medal_icon(); output once, right after <body>. */
+/** Kept for compatibility with the existing layout. */
 function medal_defs(): string
 {
-    $sets = [
-        'gold'   => ['#fff2a8', '#f6b81a', '#a86a00', '#e5483c', '#a8221a'],
-        'silver' => ['#ffffff', '#c3ccd1', '#6f7f87', '#3e8fd6', '#245f99'],
-        'bronze' => ['#ffd2a8', '#d98a4a', '#7c3d12', '#2fa24a', '#176a2c'],
-    ];
-    $out = '<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>';
-    foreach ($sets as $t => [$hi, $mid, $lo, $r1, $r2]) {
-        $out .= "<radialGradient id=\"disc-$t\" cx=\"35%\" cy=\"30%\" r=\"80%\"><stop offset=\"0\" stop-color=\"$hi\"/><stop offset=\".5\" stop-color=\"$mid\"/><stop offset=\"1\" stop-color=\"$lo\"/></radialGradient>"
-            . "<linearGradient id=\"edge-$t\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"$hi\"/><stop offset=\"1\" stop-color=\"$lo\"/></linearGradient>"
-            . "<linearGradient id=\"rib-$t\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"$r1\"/><stop offset=\"1\" stop-color=\"$r2\"/></linearGradient>";
-    }
-    return $out . '</defs></svg>';
+    return '';
 }

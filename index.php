@@ -1,6 +1,7 @@
 <?php require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/medals.php';
 require_once __DIR__ . '/includes/layout.php';
+require_once __DIR__ . '/includes/sport_details.php';
 $leaders = medal_standings();
 $tallyUpdatedAt = medal_tally_updated_at();
 $hasMedals = array_sum(array_map(fn($team) => (int)$team['gold'] + (int)$team['silver'] + (int)$team['bronze'], $leaders)) > 0;
@@ -9,13 +10,15 @@ page_head('Live Medal Tracker','home');
 ?>
 <section class="hero">
 <div>
-<span class="eyebrow">Leyte Games · Official results portal</span>
-<h1>Leyte Provincial<br>Athletic Meet</h1>
-<p>Follow verified medal standings and event results as they are announced by each sport’s authorized competition administrator.</p>
-<div class="hero-date">05—09 DECEMBER 2026 · LEYTE</div>
+<span class="eyebrow">DepEd Leyte Division · Official results portal</span>
+<h1>DepEd Leyte Division<br>Athletic Meet 2026</h1>
+<p>The official tracker for the DepEd Leyte Division Athletic Meet 2026. Follow verified medal standings, sports results, event schedules, and competition updates in one place.</p>
+<div class="hero-event-meta">
+<div class="hero-date">05—09 DECEMBER 2026 · JARO, LEYTE</div>
 <div class="games-countdown" data-games-start="2026-12-05T00:00:00+08:00" aria-live="polite">
 <span class="countdown-label">Opening ceremony countdown</span>
 <div class="countdown-units"><span><b data-unit="days">--</b><small>Days</small></span><i>:</i><span><b data-unit="hours">--</b><small>Hours</small></span><i>:</i><span><b data-unit="minutes">--</b><small>Minutes</small></span></div>
+</div>
 </div>
 </div>
 <div class="medal-podium" aria-label="Top three delegations">
@@ -34,7 +37,7 @@ page_head('Live Medal Tracker','home');
 </div>
 <div class="podium-step">
 <b><?= $idx+1 ?></b>
-<small><?= $t?((int)$t['gold'].'G · '.(int)$t['silver'].'S · '.(int)$t['bronze'].'B'):'—' ?></small>
+<small><?= $t?((int)$t['gold'].' Gold · '.(int)$t['silver'].' Silver · '.(int)$t['bronze'].' Bronze'):'—' ?></small>
 </div>
 </div>
 <?php endforeach; ?>
@@ -63,12 +66,11 @@ page_head('Live Medal Tracker','home');
 <td colspan="6" class="empty">No medals have been published yet.</td>
 </tr>
 <?php endif;
-$rank=0; $lastScore=null;
+$rank=0;
 foreach($leaders as $i=>$team):
     $total=$team['gold']+$team['silver']+$team['bronze'];
-    $score=$team['gold'].'-'.$team['silver'].'-'.$team['bronze'];
-    if ($score !== $lastScore) { $rank=$i+1; $lastScore=$score; }
-    $tier=$rank <= 3 ? ['','gold','silver','bronze'][$rank] : ''; ?><tr class="row <?= $tier ? 'top top-'.$tier : '' ?>" style="--i:<?= $i ?>">
+    $rank=$i+1;
+    $tier=$rank <= 3 ? ['','gold','silver','bronze'][$rank] : ''; ?><tr class="row <?= area_brand_class($team['team']) ?> <?= $tier ? 'top top-'.$tier : '' ?>" style="--i:<?= $i ?>">
 <td class="rank"><span class="rank-badge <?= $tier ?>"><?= $rank ?></span></td>
 <td class="team">
 <?= area_logo_bg($team['team']) ?>
@@ -90,12 +92,12 @@ foreach($leaders as $i=>$team):
 <a href="<?= app_url('results.php') ?>">Explore sports <span class="arr"><?= icon("arrow",14) ?></span></a>
 </div>
 <div class="grid">
-<?php foreach($sports as $sport): ?><a class="sport-card" href="<?= app_url('results.php') ?>?sport=<?= $sport['id'] ?>">
+<?php foreach($sports as $sport): $venue = sport_venue($sport['name']); ?><a class="sport-card" href="<?= app_url('sports.php') ?>">
 <span class="sport-icon"><?= sport_icon($sport['name'],$sport['icon'],30) ?></span>
 <h3>
 <?= htmlspecialchars($sport['name']) ?></h3>
 <p>
-<?= htmlspecialchars($sport['description']) ?></p>
+<?= htmlspecialchars($venue ?: ($sport['description'] ?: 'Venue to be announced.')) ?></p>
 </a>
 <?php endforeach;
 ?></div>

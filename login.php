@@ -20,10 +20,17 @@ if($_SERVER['REQUEST_METHOD']==='POST') {
 }
 require_once __DIR__ . '/includes/layout.php';
 page_head('Admin Sign In');
-?><div class="auth-wrap">
-<form class="form-card" method="post"><?= csrf_field() ?>
+?><section class="auth-wrap">
+<div class="auth-intro">
+<span class="eyebrow">Secure staff access</span>
+<h1>Manage verified meet results.</h1>
+<p>Authorized administrators can publish official medal standings, event results, schedules, and sports information.</p>
+<ul><li>Publish verified competition results</li><li>Manage sports and event schedules</li><li>Review athlete and delegation entries</li></ul>
+</div>
+<form class="form-card auth-card" method="post"><?= csrf_field() ?>
+<span class="form-kicker">Administrator access</span>
 <h1>Admin sign in</h1>
-<p>For authorized sport and meet administrators only.</p>
+<p>Use your authorized account to enter the results desk.</p>
 <?php if($error): ?><div class="notice error">
 <?= $error ?></div>
 <?php endif;
@@ -37,6 +44,6 @@ page_head('Admin Sign In');
 </div>
 <button class="btn" type="submit">Sign in to console</button>
 </form>
-</div>
+</section>
 <?php page_foot();
 ?>

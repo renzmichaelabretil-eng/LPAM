@@ -30,10 +30,10 @@ function page_head(string $title, string $active = ''): void
     <div class="bg-lights" aria-hidden="true"><span class="beam b1"></span><span class="beam b2"></span><span class="beam b3"></span><span class="orb o1"></span><span class="orb o2"></span></div>
     <header class="site-header">
         <a class="brand" href="<?= app_url() ?>">
-            <img class="brand-logo" src="<?= app_url('assets/leyte-meet-logo-web.png') ?>" alt="Leyte Provincial Athletic Meet logo">
-            <span><b>LEYTE</b><small>Provincial Athletic Meet</small></span>
+            <img class="brand-logo" src="<?= app_url('assets/leyte-meet-logo-web.png') ?>" alt="DepEd Leyte Division Athletic Meet logo">
         </a>
-        <nav class="<?= is_admin() ? 'admin-header-nav' : '' ?>">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-navigation" aria-label="Open navigation menu"><span></span><span></span><span></span></button>
+        <nav id="site-navigation" class="<?= is_admin() ? 'admin-header-nav' : '' ?>">
             <?php if (is_admin()): ?>
                 <a href="<?= app_url() ?>">Public portal ↗</a>
                 <?php if (is_sports_admin() || is_technical_official()): ?><a class="<?= $isAdminRoute && ($adminPage === 'index.php' || str_ends_with($scriptPath, '/admin/')) ? 'active' : '' ?>" href="<?= app_url('admin/') ?>">Results desk</a><?php endif; ?>
@@ -51,7 +51,7 @@ function page_head(string $title, string $active = ''): void
                 <a class="<?= $active === 'results' ? 'active' : '' ?>" href="<?= app_url('results.php') ?>">Results</a>
                 <a class="<?= $active === 'sports' ? 'active' : '' ?>" href="<?= app_url('sports.php') ?>">Sports Details</a>
                 <a class="<?= $active === 'calendar' ? 'active' : '' ?>" href="<?= app_url('calendar.php') ?>">Calendar</a>
-                <a class="<?= $active === 'updates' ? 'active' : '' ?>" href="<?= app_url('updates.php') ?>">Updates</a>
+                <a class="<?= $active === 'about' ? 'active' : '' ?>" href="<?= app_url('updates.php') ?>">About</a>
                 <a class="login" href="<?= app_url('login.php') ?>">Admin sign in</a>
             <?php endif; ?>
         </nav>
@@ -67,11 +67,9 @@ function page_foot(): void
     </main>
     <div class="bottom-pattern" aria-hidden="true"></div>
     <footer>
-        <div>
-            <b>LEYTE PROVINCIAL ATHLETIC MEET</b>
-            <span>One Province · One Goal · One Spirit</span>
-        </div>
-        <p>Official live results and medal tracker</p>
+        <img class="footer-deped-logo" src="<?= app_url('assets/footer-deped-logo.png') ?>" alt="Department of Education, Bagong Pilipinas, and Schools Division of Leyte">
+        <p class="footer-copyright">© 2026 DepEd Leyte Division Athletic Meet Medal Tracker System</p>
+        <img class="footer-meet-logo" src="<?= app_url('assets/footer-meet-logo.png') ?>" alt="Leyte Provincial Athletic Meet 2026">
     </footer>
     <script>window.csrfToken=<?= json_encode(csrf_token()) ?>;</script>
     <script src="<?= app_url('assets/app.js') ?>?v=<?= @filemtime(__DIR__ . '/../assets/app.js') ?: 1 ?>"></script>
